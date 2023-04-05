@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import todos from "./todos.json";
 import TodoItem from "./TodoItem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ITodo from "../../interfaces/Todo.interface";
 
 const List = styled.ul`
   display: flex;
@@ -10,20 +10,34 @@ const List = styled.ul`
   gap: 20px;
 `;
 
-const TodoList = ({}) => {
-  const [todoList, setTodoList] = useState(todos);
-  const saveTask = (values) => {
+const initialTodos = () => {
+  const savedTodos = localStorage.getItem("todoList");
+  return savedTodos ? JSON.parse(savedTodos) : [];
+};
+const TodoList = () => {
+  const [todoList, setTodoList] = useState<ITodo[]>(initialTodos);
+
+  const saveTask = (values: ITodo) => {
     setTodoList((arr) =>
       arr.map((el) => {
-        if (values.id === el._id) return values;
+        if (values._id === el._id) {
+          return values;
+        }
         return el;
       })
     );
   };
-  const deleteTodo = (id) => {
+
+  const deleteTodo = (id: string) => {
     console.log(id);
     setTodoList((arr) => arr.filter(({ _id }) => _id !== id));
   };
+
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+    console.log(todoList);
+  }, [todoList]);
+
   return (
     <List>
       {todoList.map((el) => {

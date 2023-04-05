@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { MdModeEditOutline, MdDone } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
+import ITodo from "../../interfaces/Todo.interface";
 
 import Modal from "./Modal";
 
@@ -26,7 +27,7 @@ const Item = styled.li`
     text-decoration: none;
   }
 `;
-const ItemTitle = styled.h3`
+const ItemTitle = styled.h3<ITitle>`
   font-size: 16px;
   text-decoration: ${({ isCompleted }) =>
     isCompleted ? "line-through" : "none"};
@@ -71,7 +72,16 @@ const Btn = styled.button`
   }
 `;
 
-const TodoItem = ({ el, saveTask, deleteTodo }) => {
+interface IProps {
+  el: ITodo;
+  saveTask: (el: ITodo) => void;
+  deleteTodo: (id: string) => void;
+}
+type ITitle = {
+  isCompleted: boolean;
+};
+
+const TodoItem = ({ el, saveTask, deleteTodo }: IProps) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [todo, setTodo] = useState("");
   const [isEdit, setIsEdit] = useState(false);
@@ -79,15 +89,15 @@ const TodoItem = ({ el, saveTask, deleteTodo }) => {
   useEffect(() => {
     setTodo(el.title);
     setIsCompleted(el.isCompleted);
-  }, []);
+  }, [el.title, el.isCompleted]);
 
-  const saveTodo = (val) => {
+  const saveTodo = (val: string) => {
     setTodo(val);
     setIsEdit(false);
     saveTask({
       isCompleted,
       title: val,
-      id: el._id,
+      _id: el._id,
     });
   };
 
@@ -100,7 +110,7 @@ const TodoItem = ({ el, saveTask, deleteTodo }) => {
           saveTask({
             isCompleted,
             title: todo,
-            id: el._id,
+            _id: el._id,
           });
         }}
       >
@@ -125,7 +135,7 @@ const TodoItem = ({ el, saveTask, deleteTodo }) => {
         <Modal
           todo={todo}
           closeModal={() => setIsEdit(false)}
-          updateTodo={(val) => saveTodo(val)}
+          updateTodo={(val: string) => saveTodo(val)}
         />
       )}
     </Item>

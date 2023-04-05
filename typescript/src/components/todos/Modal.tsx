@@ -71,11 +71,24 @@ const SubmitBtn = styled.button`
   }
 `;
 
-const Modal = ({ todo = "", updateTodo, closeModal, btnTitle = "Edit" }) => {
+interface IProps {
+  todo: string;
+  updateTodo: (val: string) => void;
+  closeModal(): void;
+  btnTitle?: string;
+}
+
+const Modal = ({
+  todo = "",
+  updateTodo,
+  closeModal,
+  btnTitle = "Edit",
+}: IProps) => {
   const [value, setValue] = useState(todo);
 
-  const saveChanges = async (e) => {
-    if (e.keyCode === 13) await updateTodo(e.target.value);
+  const saveChanges = (e: KeyboardEvent) => {
+    const inputEl = e.target as HTMLInputElement;
+    if (e.key === "Enter") updateTodo(inputEl.value);
   };
 
   useEffect(() => {
@@ -83,7 +96,7 @@ const Modal = ({ todo = "", updateTodo, closeModal, btnTitle = "Edit" }) => {
     return () => {
       document.removeEventListener("keyup", saveChanges);
     };
-  }, []);
+  });
 
   return (
     <Backdrop
@@ -97,9 +110,7 @@ const Modal = ({ todo = "", updateTodo, closeModal, btnTitle = "Edit" }) => {
         </Close>
         <Title>{"Next up:"}</Title>
         <input value={value} onChange={(e) => setValue(e.target.value)} />
-        <SubmitBtn onClick={async () => await updateTodo(value)}>
-          {btnTitle}
-        </SubmitBtn>
+        <SubmitBtn onClick={() => updateTodo(value)}>{btnTitle}</SubmitBtn>
       </ModalWrap>
     </Backdrop>
   );
